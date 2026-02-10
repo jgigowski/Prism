@@ -1,0 +1,32 @@
+{
+  "name": "prism",
+  "version": "1.0.0",
+  "description": "Prism - Enterprise Application Portal with Okta Authentication",
+  "main": "app.js",
+  "scripts": {
+    "start": "node app.js",
+    "dev": "nodemon app.js"
+  },
+  "keywords": [
+    "okta",
+    "authentication",
+    "prism",
+    "express"
+  ],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@okta/jwt-verifier": "^4.0.2",
+    "@okta/oidc-middleware": "^5.5.0",
+    "@okta/okta-sdk-nodejs": "^7.0.0",
+    "axios": "^1.6.0",
+    "dotenv": "^16.3.1",
+    "ejs": "^3.1.9",
+    "express": "^4.18.2",
+    "express-session": "^1.17.3"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.1",
+    "tailwindcss": "^3.3.5"
+  }
+}

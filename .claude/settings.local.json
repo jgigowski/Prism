@@ -1,0 +1,28 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npm view @okta/oidc-middleware versions --json)",
+      "Bash(npm install)",
+      "Bash(node -c app.js)",
+      "Bash(node -c middleware/auth.js)",
+      "Bash(node -c routes/auth.js)",
+      "Bash(node -c routes/index.js)",
+      "Bash(node -c routes/profile.js)",
+      "Bash(node -c routes/settings.js)",
+      "Bash(node -c utils/okta.js)",
+      "Bash(npm start)",
+      "Bash(openssl rand -base64 32)",
+      "Bash(pkill -f \"node app.js\")",
+      "Bash(lsof -ti:3000)",
+      "Bash(xargs kill -9)",
+      "Bash(node app.js)",
+      "Bash(curl -s http://localhost:3000)",
+      "Bash(curl -s -o /dev/null -w \"%{http_code}\" https://ocibrawndo.oktademo.site/oauth2/default/.well-known/openid-configuration)",
+      "Bash(curl -s https://ocibrawndo.oktademo.site/oauth2/default/.well-known/openid-configuration)",
+      "Bash(lsof -i :3000 -t)",
+      "Bash(kill 59100)",
+      "Bash(xargs kill)",
+      "Bash(npm install @okta/jwt-verifier)"
+    ]
+  }
+}

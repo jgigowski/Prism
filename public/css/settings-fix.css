@@ -1,0 +1,89 @@
+/* Settings page specific fixes - Complete isolation */
+
+/* Create separate stacking context for entire settings page */
+.settings-container {
+  position: relative !important;
+  z-index: 1 !important;
+}
+
+/* Enrolled section - completely isolated */
+.enrolled-section {
+  position: static !important;
+  display: block !important;
+  overflow: visible !important;
+  margin-bottom: 4rem !important;
+  background: white !important;
+  padding-bottom: 2rem !important;
+}
+
+.enrolled-item {
+  position: static !important;
+  display: flex !important;
+  overflow: visible !important;
+  min-height: 80px !important;
+}
+
+.remove-button-form {
+  position: static !important;
+  display: block !important;
+  flex-shrink: 0 !important;
+  margin-left: 1rem !important;
+}
+
+.remove-button {
+  position: static !important;
+  display: inline-flex !important;
+  visibility: visible !important;
+  opacity: 1 !important;
+  pointer-events: auto !important;
+  cursor: pointer !important;
+  background-color: white !important;
+}
+
+/* Enrollment section - keep below */
+.enroll-section {
+  position: static !important;
+  display: block !important;
+  margin-top: 4rem !important;
+  clear: both !important;
+}
+
+.enroll-card {
+  position: static !important;
+  display: flex !important;
+  max-height: 200px !important;
+  overflow: visible !important;
+}
+
+/* Remove ALL transforms and transitions globally on settings page */
+.settings-container * {
+  transform: none !important;
+  transition: none !important;
+  will-change: auto !important;
+  animation: none !important;
+}
+
+/* Disable ALL hover effects on settings page */
+.settings-container *:hover {
+  transform: none !important;
+  transition: none !important;
+  animation: none !important;
+}
+
+/* Force visibility */
+.remove-button,
+.remove-button * {
+  visibility: visible !important;
+  opacity: 1 !important;
+  display: inline-flex !important;
+}
+
+/* Prevent any classes from being added that might hide buttons */
+.remove-button.hidden,
+.remove-button[style*="display: none"],
+.remove-button[style*="visibility: hidden"],
+.remove-button[style*="opacity: 0"] {
+  display: inline-flex !important;
+  visibility: visible !important;
+  opacity: 1 !important;
+}

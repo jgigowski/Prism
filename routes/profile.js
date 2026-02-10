@@ -1,0 +1,69 @@
+const express = require('express');
+const router = express.Router();
+const { ensureAuthenticated } = require('../middleware/auth');
+const { getUserProfile, updateUserProfile } = require('../utils/okta');
+
+/**
+ * GET profile page
+ */
+router.get('/', ensureAuthenticated, async (req, res) => {
+  try {
+    const userInfo = req.userContext.userinfo;
+    const accessToken = req.userContext.tokens.access_token;
+
+    // Fetch full user profile from Okta
+    const profile = await getUserProfile(accessToken, userInfo.sub);
+
+    res.render('profile', {
+      title: 'My Profile',
+      user: userInfo,
+      profile: profile.profile,
+      success: req.query.success === 'true',
+      error: req.query.error
+    });
+  } catch (error) {
+    console.error('Profile page error:', error);
+    res.status(500).render('error', {
+      message: 'Unable to load profile',
+      error: process.env.NODE_ENV === 'development' ? error : {}
+    });
+  }
+});
+
+/**
+ * POST update profile
+ */
+router.post('/', ensureAuthenticated, async (req, res) => {
+  try {
+    const userInfo = req.userContext.userinfo;
+    const accessToken = req.userContext.tokens.access_token;
+
+    // Extract profile fields from request body
+    const profileData = {
+      firstName: req.body.firstName,
+      lastName: req.body.lastName,
+      email: req.body.email,
+      mobilePhone: req.body.mobilePhone,
+      secondEmail: req.body.secondEmail
+    };
+
+    // Update profile via Okta API
+    await updateUserProfile(accessToken, userInfo.sub, profileData);
+
+    res.redirect('/profile?success=true');
+  } catch (error) {
+    console.error('Profile update error:', error);
+
+    // Handle specific error cases
+    let errorMessage = 'Failed to update profile';
+    if (error.response?.data?.errorCode === 'E0000023') {
+      errorMessage = 'Profile cannot be updated because it is managed by your organization\'s directory system. Please contact your IT administrator to make changes.';
+    } else if (error.response?.data?.errorSummary) {
+      errorMessage = error.response.data.errorSummary;
+    }
+
+    res.redirect('/profile?error=' + encodeURIComponent(errorMessage));
+  }
+});
+
+module.exports = router;
