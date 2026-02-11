@@ -41,14 +41,17 @@ app.locals.getUserSessionIds = getUserSessionIds;
 app.locals.untrackUserSession = untrackUserSession;
 
 // Okta OIDC Configuration
+const OKTA_AUTH_SERVER = process.env.OKTA_AUTH_SERVER_ID || 'default';
+
 console.log('Configuring OIDC with:');
 console.log('  Domain:', process.env.OKTA_DOMAIN);
-console.log('  Issuer:', `https://${process.env.OKTA_DOMAIN}/oauth2/default`);
+console.log('  Auth Server:', OKTA_AUTH_SERVER);
+console.log('  Issuer:', `https://${process.env.OKTA_DOMAIN}/oauth2/${OKTA_AUTH_SERVER}`);
 console.log('  Client ID:', process.env.OKTA_CLIENT_ID);
 console.log('  Redirect URI:', process.env.OKTA_REDIRECT_URI);
 
 const oidc = new ExpressOIDC({
-  issuer: `https://${process.env.OKTA_DOMAIN}/oauth2/default`,
+  issuer: `https://${process.env.OKTA_DOMAIN}/oauth2/${OKTA_AUTH_SERVER}`,
   client_id: process.env.OKTA_CLIENT_ID,
   client_secret: process.env.OKTA_CLIENT_SECRET,
   appBaseUrl: process.env.OKTA_REDIRECT_URI.replace('/authorization-code/callback', ''),
@@ -97,7 +100,7 @@ app.get('/login/step-up', (req, res) => {
   req.session.stepUpPending = true;
 
   // Build the authorization URL with ACR values for MFA
-  const authorizationUrl = new URL(`https://${process.env.OKTA_DOMAIN}/oauth2/default/v1/authorize`);
+  const authorizationUrl = new URL(`https://${process.env.OKTA_DOMAIN}/oauth2/${OKTA_AUTH_SERVER}/v1/authorize`);
   authorizationUrl.searchParams.set('client_id', process.env.OKTA_CLIENT_ID);
   authorizationUrl.searchParams.set('response_type', 'code');
   authorizationUrl.searchParams.set('scope', 'openid profile email');
@@ -138,7 +141,7 @@ app.get('/authorization-code/callback', async (req, res, next) => {
 
     // Exchange code for tokens
     await axios.post(
-      `https://${process.env.OKTA_DOMAIN}/oauth2/default/v1/token`,
+      `https://${process.env.OKTA_DOMAIN}/oauth2/${OKTA_AUTH_SERVER}/v1/token`,
       new URLSearchParams({
         grant_type: 'authorization_code',
         code: code,

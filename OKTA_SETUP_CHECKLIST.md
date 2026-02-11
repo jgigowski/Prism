@@ -76,10 +76,11 @@ This prevents CORS issues:
 
 ---
 
-## Step 3: Configure Authorization Server Scopes
+## Step 3: Configure Authorization Server
 
 - [ ] Go to **Security** > **API** > **Authorization Servers**
-- [ ] Click on **default** authorization server
+- [ ] Click on **default** authorization server (or your custom authorization server)
+- [ ] **Note the Authorization Server ID** from the URL or settings (e.g., `default` or a custom ID like `aus1234567890`)
 
 ### Verify Scopes
 Ensure these scopes exist and are enabled:
@@ -179,6 +180,7 @@ OKTA_DOMAIN=dev-xxxxx.okta.com              # From Step 1
 OKTA_CLIENT_ID=0oa...                       # From Step 1
 OKTA_CLIENT_SECRET=abc123...                 # From Step 1
 OKTA_REDIRECT_URI=http://localhost:3000/authorization-code/callback
+OKTA_AUTH_SERVER_ID=default                  # From Step 3 (use 'default' or custom auth server ID)
 SESSION_SECRET=generate_random_string        # Run: openssl rand -base64 32
 PORT=3000
 NODE_ENV=development
