@@ -4,31 +4,33 @@
   <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
     <!-- Page Header -->
     <div class="mb-8">
-      <h1 class="text-3xl font-bold text-gray-900">My Applications</h1>
-      <p class="mt-2 text-sm text-gray-600">Access your applications and services</p>
+      <h1 class="text-3xl font-bold text-gray-900 dark:text-white">Home</h1>
+      <div class="mt-4 bg-blue-50 dark:bg-blue-900/30 border-l-4 border-blue-500 dark:border-blue-400 p-4 rounded">
+        <p class="text-gray-700 dark:text-gray-200">Welcome to Prism, your enterprise application portal. Access all your assigned applications in one centralized location with secure single sign-on authentication.</p>
+      </div>
     </div>
 
     ${apps && apps.length > 0 ? `
     <!-- Applications Grid -->
     <div class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
       ${apps.map(app => `
-      <a href="${app.linkUrl}" target="_blank" class="block bg-white overflow-hidden shadow-sm rounded-lg hover:shadow-md transition-shadow duration-200">
+      <a href="${app.linkUrl}" target="_blank" class="block bg-white dark:bg-gray-800 overflow-hidden shadow-sm rounded-lg hover:shadow-md transition-shadow duration-200">
         <div class="p-6">
           <div class="flex items-center">
             ${app.logoUrl ? `
             <img src="${app.logoUrl}" alt="${app.label}" class="h-12 w-12 rounded-lg">
             ` : `
-            <div class="h-12 w-12 rounded-lg bg-primary-100 flex items-center justify-center">
-              <svg class="h-6 w-6 text-primary-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <div class="h-12 w-12 rounded-lg bg-primary-100 dark:bg-primary-900/30 flex items-center justify-center">
+              <svg class="h-6 w-6 text-primary-600 dark:text-primary-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
               </svg>
             </div>
             `}
             <div class="ml-4 flex-1">
-              <h3 class="text-lg font-medium text-gray-900">${app.label}</h3>
-              ${app.appName ? `<p class="text-sm text-gray-500">${app.appName}</p>` : ''}
+              <h3 class="text-lg font-medium text-gray-900 dark:text-white">${app.label}</h3>
+              ${app.appName ? `<p class="text-sm text-gray-500 dark:text-gray-400">${app.appName}</p>` : ''}
             </div>
-            <svg class="h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg class="h-5 w-5 text-gray-400 dark:text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
             </svg>
           </div>
@@ -38,15 +40,15 @@
     </div>
     ` : `
     <!-- No Applications Message -->
-    <div class="bg-white shadow-sm rounded-lg p-12 text-center">
-      <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+    <div class="bg-white dark:bg-gray-800 shadow-sm rounded-lg p-12 text-center">
+      <svg class="mx-auto h-12 w-12 text-gray-400 dark:text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4"></path>
       </svg>
-      <h3 class="mt-2 text-sm font-medium text-gray-900">No applications</h3>
-      <p class="mt-1 text-sm text-gray-500">You don't have any applications assigned yet.</p>
+      <h3 class="mt-2 text-sm font-medium text-gray-900 dark:text-white">No applications</h3>
+      <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">You don't have any applications assigned yet.</p>
     </div>
     `}
   </div>
   `;
 %>
-<%- include('layouts/main', { title, user, isAuthenticated, active, body }) %>
+<%- include('layouts/main', { title, user, isAuthenticated, active, body, darkMode }) %>

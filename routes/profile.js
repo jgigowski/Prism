@@ -27,9 +27,11 @@ router.get('/', ensureAuthenticated, async (req, res) => {
     res.render('profile', {
       title: 'My Profile',
       user: userInfo,
+      isAuthenticated: true,
       profile: fullProfile,
       success: req.query.success === 'true',
-      error: req.query.error
+      error: req.query.error,
+      darkMode: req.session.darkMode || false
     });
   } catch (error) {
     console.error('Profile page error:', error);
@@ -81,6 +83,19 @@ router.post('/', ensureAuthenticated, async (req, res) => {
     }
 
     res.redirect('/profile?error=' + encodeURIComponent(errorMessage));
+  }
+});
+
+/**
+ * POST toggle dark mode
+ */
+router.post('/dark-mode', ensureAuthenticated, (req, res) => {
+  try {
+    req.session.darkMode = req.body.darkMode || false;
+    res.json({ success: true });
+  } catch (error) {
+    console.error('Dark mode toggle error:', error);
+    res.status(500).json({ success: false, error: 'Failed to save preference' });
   }
 });
 

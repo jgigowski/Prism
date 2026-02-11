@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const { ensureAuthenticated } = require('../middleware/auth');
+const { ensureStepUpMfa } = require('../middleware/stepUpMfa');
 const { getUserFactors, enrollFactor, removeFactor } = require('../utils/okta');
 const axios = require('axios');
 
@@ -29,7 +30,7 @@ async function getFactors(accessToken, userId) {
 /**
  * GET settings page - list authenticators
  */
-router.get('/', ensureAuthenticated, async (req, res) => {
+router.get('/', ensureAuthenticated, ensureStepUpMfa, async (req, res) => {
   try {
     const userInfo = req.userContext.userinfo;
     const accessToken = req.userContext.tokens.access_token;
@@ -40,10 +41,12 @@ router.get('/', ensureAuthenticated, async (req, res) => {
     res.render('settings', {
       title: 'Authenticator Settings',
       user: userInfo,
+      isAuthenticated: true,
       factors: factors,
       success: req.query.success,
       error: req.query.error,
-      enrollmentData: req.session.enrollmentData || null
+      enrollmentData: req.session.enrollmentData || null,
+      darkMode: req.session.darkMode || false
     });
 
     // Clear enrollment data after rendering

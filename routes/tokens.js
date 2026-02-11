@@ -46,6 +46,7 @@ router.get('/', ensureAuthenticated, (req, res) => {
     res.render('tokens', {
       title: 'JWT Tokens',
       user: req.userContext.userinfo,
+      isAuthenticated: true,
       tokens: {
         access_token: tokens.access_token,
         id_token: tokens.id_token,
@@ -69,7 +70,8 @@ router.get('/', ensureAuthenticated, (req, res) => {
           expired: idTokenExp < now,
           remaining: idTokenExp - now
         } : null
-      }
+      },
+      darkMode: req.session.darkMode || false
     });
   } catch (error) {
     console.error('Tokens page error:', error);

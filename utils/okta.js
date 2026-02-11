@@ -2,6 +2,9 @@ const okta = require('@okta/okta-sdk-nodejs');
 const axios = require('axios');
 const OktaJwtVerifier = require('@okta/jwt-verifier');
 
+// Authorization Server ID (configurable via environment)
+const OKTA_AUTH_SERVER = process.env.OKTA_AUTH_SERVER_ID || 'default';
+
 // Initialize Okta Client
 const oktaClient = new okta.Client({
   orgUrl: `https://${process.env.OKTA_DOMAIN}`,
@@ -10,7 +13,7 @@ const oktaClient = new okta.Client({
 
 // Initialize JWT Verifier for backchannel logout tokens
 const jwtVerifier = new OktaJwtVerifier({
-  issuer: `https://${process.env.OKTA_DOMAIN}/oauth2/default`,
+  issuer: `https://${process.env.OKTA_DOMAIN}/oauth2/${OKTA_AUTH_SERVER}`,
   clientId: process.env.OKTA_CLIENT_ID
 });
 
@@ -210,7 +213,7 @@ async function getAvailableFactors(accessToken, userId) {
  * Globally revokes user tokens on Okta's authorization server
  */
 async function revokeTokens(accessToken, refreshToken) {
-  const revokeUrl = `https://${process.env.OKTA_DOMAIN}/oauth2/default/v1/revoke`;
+  const revokeUrl = `https://${process.env.OKTA_DOMAIN}/oauth2/${OKTA_AUTH_SERVER}/v1/revoke`;
   const clientAuth = Buffer.from(`${process.env.OKTA_CLIENT_ID}:${process.env.OKTA_CLIENT_SECRET}`).toString('base64');
 
   try {

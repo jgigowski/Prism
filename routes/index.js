@@ -23,7 +23,9 @@ router.get('/', ensureAuthenticated, async (req, res) => {
     res.render('home', {
       title: 'My Applications',
       user: userInfo,
-      apps: apps
+      isAuthenticated: true,
+      apps: apps,
+      darkMode: req.session.darkMode || false
     });
   } catch (error) {
     console.error('Home page error:', error);
