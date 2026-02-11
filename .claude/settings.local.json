@@ -22,7 +22,8 @@
       "Bash(lsof -i :3000 -t)",
       "Bash(kill 59100)",
       "Bash(xargs kill)",
-      "Bash(npm install @okta/jwt-verifier)"
+      "Bash(npm install @okta/jwt-verifier)",
+      "Bash(git push origin master)"
     ]
   }
 }
