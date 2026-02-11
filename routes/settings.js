@@ -41,10 +41,12 @@ router.get('/', ensureAuthenticated, ensureStepUpMfa, async (req, res) => {
     res.render('settings', {
       title: 'Authenticator Settings',
       user: userInfo,
+      isAuthenticated: true,
       factors: factors,
       success: req.query.success,
       error: req.query.error,
-      enrollmentData: req.session.enrollmentData || null
+      enrollmentData: req.session.enrollmentData || null,
+      darkMode: req.session.darkMode || false
     });
 
     // Clear enrollment data after rendering
