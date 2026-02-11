@@ -92,12 +92,14 @@ For advanced features like factor management, create an API token:
    SESSION_SECRET=your_random_secret_string_here
    PORT=3000
    NODE_ENV=development
+   OKTA_API_TOKEN=your_okta_api_token_here
    ```
 
    **Important**:
    - Replace `dev-xxxxx.okta.com` with your actual Okta domain
    - Replace `your_client_id_here` with your Client ID from Okta
    - Replace `your_client_secret_here` with your Client Secret from Okta
+   - Replace `your_okta_api_token_here` with your Okta API Token (from step 4 in Okta Configuration)
    - Generate a strong random string for `SESSION_SECRET` (e.g., use `openssl rand -base64 32`)
 
 ## Running the Application
