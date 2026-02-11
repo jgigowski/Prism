@@ -93,6 +93,22 @@ If any are missing, add them:
 - [ ] Click **Add Scope**
 - [ ] Fill in required fields and save
 
+### Add Client to Access Policy
+
+**Important**: Your application must be added to an Access Policy to obtain tokens from the authorization server.
+
+- [ ] Click the **Access Policies** tab
+- [ ] Click on the policy you want to use (e.g., **Default Policy**) or create a new one
+- [ ] Click **Add Rule** (or edit an existing rule)
+- [ ] In the rule configuration:
+  - [ ] Set **IF Grant type is**: Select **Authorization Code** (and others as needed)
+  - [ ] Set **AND Client is**: Select **The following clients** and add your **Prism** application
+  - [ ] Configure token lifetimes as desired
+- [ ] Click **Create Rule** or **Update Rule**
+- [ ] Verify your application appears in the policy's client list
+
+**Note**: If using a custom authorization server, you may need to create a new Access Policy specifically for your application.
+
 ---
 
 ## Step 4: Assign Users to Application
@@ -220,10 +236,12 @@ NODE_ENV=development
 - [ ] Check for trailing slashes or http vs https mismatches
 - [ ] Ensure redirect URI is added to Okta app settings
 
-### "Access denied" error
+### "Access denied" or "No matching policy" error
 - [ ] Verify user is assigned to the application
 - [ ] Check authentication policies aren't blocking access
 - [ ] Verify authorization server is active
+- [ ] **Verify the client is added to an Access Policy** on the authorization server (Step 3)
+- [ ] Check that the Access Policy rule includes the correct grant type (Authorization Code)
 
 ### CORS errors
 - [ ] Add Trusted Origin in Okta (Step 2)
