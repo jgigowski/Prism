@@ -2,3 +2,13 @@ node_modules/
 .env
 .DS_Store
 *.log
+
+# User settings (local storage)
+data/user-settings/*
+!data/user-settings/.gitkeep
+
+# Python virtual environment
+venv/
+
+# Temporary files
+analyze_grid.py
