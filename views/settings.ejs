@@ -3,6 +3,36 @@
   const isEnrolling = typeof enrollmentData !== 'undefined' && enrollmentData !== null;
   const enrollingType = isEnrolling ? enrollmentData.factorType : null;
 
+  // Map Okta factor types to user-friendly names
+  const factorTypeNames = {
+    'signed_nonce': 'Okta Verify',
+    'token:software:totp': 'Authenticator App (TOTP)',
+    'push': 'Okta Verify Push',
+    'sms': 'SMS Authentication',
+    'call': 'Voice Call',
+    'email': 'Email Authentication',
+    'question': 'Security Question',
+    'token:hotp': 'Hardware Token (HOTP)',
+    'token:hardware': 'Hardware Token (YubiKey)',
+    'u2f': 'Security Key (U2F)',
+    'webauthn': 'Security Key (FIDO2)',
+    'token': 'Hardware Token'
+  };
+
+  // Get friendly name for a factor type
+  const getFactorName = (factorType, provider) => {
+    if (provider === 'OKTA' && (factorType === 'signed_nonce' || factorType === 'push')) {
+      return 'Okta Verify';
+    }
+    if (provider === 'GOOGLE' && factorType === 'token:software:totp') {
+      return 'Google Authenticator';
+    }
+    if (provider === 'YUBICO') {
+      return 'YubiKey';
+    }
+    return factorTypeNames[factorType] || factorType;
+  };
+
   const body = `
   <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
     <!-- Page Header -->
@@ -137,9 +167,25 @@
               <svg class="h-12 w-12 text-primary-500 dark:text-primary-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z"></path>
               </svg>
-              ` : factor.factorType === 'sms' ? `
+              ` : factor.factorType === 'sms' || factor.factorType === 'call' ? `
               <svg class="h-12 w-12 text-primary-500 dark:text-primary-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"></path>
+              </svg>
+              ` : factor.factorType === 'signed_nonce' || factor.factorType === 'push' ? `
+              <svg class="h-12 w-12 text-primary-500 dark:text-primary-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"></path>
+              </svg>
+              ` : factor.factorType === 'email' ? `
+              <svg class="h-12 w-12 text-primary-500 dark:text-primary-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path>
+              </svg>
+              ` : factor.factorType === 'webauthn' || factor.factorType === 'u2f' || factor.provider === 'YUBICO' ? `
+              <svg class="h-12 w-12 text-primary-500 dark:text-primary-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z"></path>
+              </svg>
+              ` : factor.factorType === 'question' ? `
+              <svg class="h-12 w-12 text-primary-500 dark:text-primary-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
               </svg>
               ` : `
               <svg class="h-12 w-12 text-primary-500 dark:text-primary-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -149,10 +195,7 @@
             </div>
             <div class="ml-5">
               <h3 class="text-xl font-medium text-gray-900 dark:text-white">
-                ${factor.factorType === 'token:software:totp' ? 'Authenticator App (TOTP)' :
-                  factor.factorType === 'sms' ? 'SMS Authentication' :
-                  factor.factorType === 'email' ? 'Email Authentication' :
-                  factor.factorType}
+                ${getFactorName(factor.factorType, factor.provider)}
               </h3>
               <p class="text-sm text-gray-600 dark:text-gray-400 mt-1">
                 ${factor.factorType === 'sms' && factor.profile?.phoneNumber ? 'Phone: ' + factor.profile.phoneNumber : ''}
