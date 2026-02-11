@@ -82,6 +82,95 @@ app.use(session({
   }
 }));
 
+// Step-up MFA login route - must be before OIDC router
+// This route forces re-authentication with MFA requirement
+app.get('/login/step-up', (req, res) => {
+  const crypto = require('crypto');
+
+  // Generate state and nonce for OIDC security
+  const state = crypto.randomBytes(16).toString('hex');
+  const nonce = crypto.randomBytes(16).toString('hex');
+
+  // Store in session for verification on callback
+  req.session.stepUpState = state;
+  req.session.stepUpNonce = nonce;
+  req.session.stepUpPending = true;
+
+  // Build the authorization URL with ACR values for MFA
+  const authorizationUrl = new URL(`https://${process.env.OKTA_DOMAIN}/oauth2/default/v1/authorize`);
+  authorizationUrl.searchParams.set('client_id', process.env.OKTA_CLIENT_ID);
+  authorizationUrl.searchParams.set('response_type', 'code');
+  authorizationUrl.searchParams.set('scope', 'openid profile email');
+  authorizationUrl.searchParams.set('redirect_uri', process.env.OKTA_REDIRECT_URI);
+  authorizationUrl.searchParams.set('state', state);
+  authorizationUrl.searchParams.set('nonce', nonce);
+  authorizationUrl.searchParams.set('acr_values', 'urn:okta:loa:2fa:any');
+  authorizationUrl.searchParams.set('max_age', '0'); // Force re-authentication
+
+  res.redirect(authorizationUrl.toString());
+});
+
+// Step-up callback handler - intercepts before OIDC middleware when step-up is pending
+app.get('/authorization-code/callback', async (req, res, next) => {
+  // Only handle if this is a step-up callback
+  if (!req.session.stepUpPending) {
+    return next(); // Let OIDC middleware handle normal login
+  }
+
+  const axios = require('axios');
+
+  try {
+    const { code, state, error, error_description } = req.query;
+
+    // Check for errors from Okta
+    if (error) {
+      console.error('Step-up auth error:', error, error_description);
+      req.session.stepUpPending = false;
+      return res.redirect('/settings?error=' + encodeURIComponent(error_description || 'MFA verification failed'));
+    }
+
+    // Verify state matches
+    if (state !== req.session.stepUpState) {
+      console.error('State mismatch in step-up callback');
+      req.session.stepUpPending = false;
+      return res.redirect('/settings?error=' + encodeURIComponent('Invalid state - please try again'));
+    }
+
+    // Exchange code for tokens
+    await axios.post(
+      `https://${process.env.OKTA_DOMAIN}/oauth2/default/v1/token`,
+      new URLSearchParams({
+        grant_type: 'authorization_code',
+        code: code,
+        redirect_uri: process.env.OKTA_REDIRECT_URI,
+        client_id: process.env.OKTA_CLIENT_ID,
+        client_secret: process.env.OKTA_CLIENT_SECRET
+      }),
+      {
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' }
+      }
+    );
+
+    // Mark step-up as verified
+    req.session.stepUpVerified = Date.now();
+
+    // Clean up step-up session data
+    delete req.session.stepUpState;
+    delete req.session.stepUpNonce;
+    req.session.stepUpPending = false;
+
+    // Redirect to the original destination
+    const returnTo = req.session.stepUpReturnTo || '/settings';
+    delete req.session.stepUpReturnTo;
+
+    res.redirect(returnTo);
+  } catch (err) {
+    console.error('Step-up callback error:', err.response?.data || err.message);
+    req.session.stepUpPending = false;
+    res.redirect('/settings?error=' + encodeURIComponent('MFA verification failed'));
+  }
+});
+
 // Okta middleware
 app.use(oidc.router);
 

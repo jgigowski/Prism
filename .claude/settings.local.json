@@ -23,7 +23,8 @@
       "Bash(kill 59100)",
       "Bash(xargs kill)",
       "Bash(npm install @okta/jwt-verifier)",
-      "Bash(git push origin master)"
+      "Bash(git pull:*)",
+      "Bash(git stash:*)"
     ]
   }
 }

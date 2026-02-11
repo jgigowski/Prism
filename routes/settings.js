@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const { ensureAuthenticated } = require('../middleware/auth');
+const { ensureStepUpMfa } = require('../middleware/stepUpMfa');
 const { getUserFactors, enrollFactor, removeFactor } = require('../utils/okta');
 const axios = require('axios');
 
@@ -29,7 +30,7 @@ async function getFactors(accessToken, userId) {
 /**
  * GET settings page - list authenticators
  */
-router.get('/', ensureAuthenticated, async (req, res) => {
+router.get('/', ensureAuthenticated, ensureStepUpMfa, async (req, res) => {
   try {
     const userInfo = req.userContext.userinfo;
     const accessToken = req.userContext.tokens.access_token;
