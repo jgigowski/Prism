@@ -74,6 +74,29 @@
             class="mt-1 block w-full border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-primary-500 focus:border-primary-500 sm:text-sm">
         </div>
 
+        <!-- Security Image Selection -->
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-2">Security Image</label>
+          <p class="text-sm text-gray-600 mb-4">
+            Your security image provides additional assurance that you are logging into the correct site, and not a fraudulent website.
+          </p>
+
+          <div class="security-image-grid">
+            ${[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12].map(id => {
+              const isSelected = profile?.securityImage == id;
+              return '<div class="security-image' + (isSelected ? ' selected' : '') + '"' +
+                     ' data-image-id="' + id + '"' +
+                     ' tabindex="0"' +
+                     ' role="button"' +
+                     ' aria-label="Security image ' + id + '">' +
+                     '<img src="/images/security/security-' + id + '.jpg" alt="Security image ' + id + '" loading="lazy">' +
+                     '</div>';
+            }).join('')}
+          </div>
+
+          <input type="hidden" name="securityImage" id="securityImageInput" value="${profile?.securityImage || ''}">
+        </div>
+
         <!-- Submit Button -->
         <div class="flex justify-end pt-4 border-t border-gray-200 dark:border-gray-700">
           <button type="submit"
@@ -84,6 +107,8 @@
       </form>
     </div>
   </div>
+
+  <script src="/js/profile.js"></script>
   `;
 %>
 <%- include('layouts/main', { title, user, isAuthenticated, active, body, darkMode }) %>

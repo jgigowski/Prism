@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const { ensureAuthenticated } = require('../middleware/auth');
 const { getUserProfile, updateUserProfile } = require('../utils/okta');
+const { getUserSetting, updateUserSetting } = require('../utils/userSettings');
 
 /**
  * GET profile page
@@ -14,11 +15,20 @@ router.get('/', ensureAuthenticated, async (req, res) => {
     // Fetch full user profile from Okta
     const profile = await getUserProfile(accessToken, userInfo.sub);
 
+    // Load security image from local settings
+    const securityImage = await getUserSetting(userInfo.sub, 'securityImage');
+
+    // Merge local settings with Okta profile
+    const fullProfile = {
+      ...profile.profile,
+      securityImage
+    };
+
     res.render('profile', {
       title: 'My Profile',
       user: userInfo,
       isAuthenticated: true,
-      profile: profile.profile,
+      profile: fullProfile,
       success: req.query.success === 'true',
       error: req.query.error,
       darkMode: req.session.darkMode || false
@@ -40,7 +50,10 @@ router.post('/', ensureAuthenticated, async (req, res) => {
     const userInfo = req.userContext.userinfo;
     const accessToken = req.userContext.tokens.access_token;
 
-    // Extract profile fields from request body
+    // Extract security image for local storage
+    const securityImage = req.body.securityImage;
+
+    // Extract profile fields for Okta (excluding securityImage)
     const profileData = {
       firstName: req.body.firstName,
       lastName: req.body.lastName,
@@ -51,6 +64,11 @@ router.post('/', ensureAuthenticated, async (req, res) => {
 
     // Update profile via Okta API
     await updateUserProfile(accessToken, userInfo.sub, profileData);
+
+    // Save security image to local settings
+    if (securityImage) {
+      await updateUserSetting(userInfo.sub, 'securityImage', securityImage);
+    }
 
     res.redirect('/profile?success=true');
   } catch (error) {
