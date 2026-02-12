@@ -28,6 +28,28 @@ async function getFactors(accessToken, userId) {
 }
 
 /**
+ * Get available authenticators from Okta org
+ */
+async function getAuthenticators() {
+  const url = `https://${process.env.OKTA_DOMAIN}/api/v1/authenticators`;
+
+  try {
+    const response = await axios({
+      method: 'GET',
+      url,
+      headers: {
+        'Authorization': `SSWS ${process.env.OKTA_API_TOKEN}`,
+        'Accept': 'application/json'
+      }
+    });
+    return response.data;
+  } catch (error) {
+    console.error('Error fetching authenticators:', error.message);
+    return [];
+  }
+}
+
+/**
  * GET settings page - list authenticators
  */
 router.get('/', ensureAuthenticated, ensureStepUpMfa, async (req, res) => {
@@ -38,6 +60,17 @@ router.get('/', ensureAuthenticated, ensureStepUpMfa, async (req, res) => {
     // Fetch enrolled factors
     const factors = await getFactors(accessToken, userInfo.sub);
 
+    // Fetch available authenticators to get passkey authenticator ID
+    const authenticators = await getAuthenticators();
+    const passkeyAuthenticator = authenticators.find(auth =>
+      auth.type === 'security_key' && auth.key === 'webauthn'
+    );
+
+    // Construct redirect URI for passkey enrollment
+    const protocol = req.protocol;
+    const host = req.get('host');
+    const redirectUri = `${protocol}://${host}/settings`;
+
     res.render('settings', {
       title: 'Authenticator Settings',
       user: userInfo,
@@ -46,7 +79,10 @@ router.get('/', ensureAuthenticated, ensureStepUpMfa, async (req, res) => {
       success: req.query.success,
       error: req.query.error,
       enrollmentData: req.session.enrollmentData || null,
-      darkMode: req.session.darkMode || false
+      darkMode: req.session.darkMode || false,
+      passkeyAuthenticatorId: passkeyAuthenticator?.id || null,
+      oktaDomain: process.env.OKTA_DOMAIN,
+      redirectUri: redirectUri
     });
 
     // Clear enrollment data after rendering
@@ -258,5 +294,7 @@ router.post('/factor/:factorId/delete', ensureAuthenticated, async (req, res) =>
     res.redirect('/settings?error=' + encodeURIComponent('Failed to remove authenticator'));
   }
 });
+
+
 
 module.exports = router;
