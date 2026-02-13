@@ -107,7 +107,7 @@ app.get('/login/step-up', (req, res) => {
   authorizationUrl.searchParams.set('redirect_uri', process.env.OKTA_REDIRECT_URI);
   authorizationUrl.searchParams.set('state', state);
   authorizationUrl.searchParams.set('nonce', nonce);
-  authorizationUrl.searchParams.set('acr_values', 'urn:okta:loa:2fa:any');
+  authorizationUrl.searchParams.set('acr_values', 'urn:okta:loa:1fa:any');// since this is step up use any 1 authenticator
   authorizationUrl.searchParams.set('max_age', '0'); // Force re-authentication
 
   res.redirect(authorizationUrl.toString());
